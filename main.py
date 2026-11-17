@@ -1,4 +1,3 @@
-"""Punto de entrada: python main.py  (Responsable: base — nadie más lo edita)"""
 from config import RUT, PROBS, C_MAX
 from series import calcular_todo
 from tablas import imprimir_tablas
@@ -21,7 +20,7 @@ def main():
     tabla_viabilidad(limites, PROBS, C_MAX)
     recomendar(limites, PROBS, C_MAX)
 
-    graficar(resultados, PROBS, limites)  # al final, porque plt.show() bloquea
+    graficar(resultados, PROBS, limites)
 
 
 if __name__ == "__main__":

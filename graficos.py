@@ -1,13 +1,7 @@
-"""Requisito 4: 3 gráficos (uno por caso), cada uno con 3 curvas S_k vs k
-y una línea horizontal en el valor al que se estabiliza cada curva.
-(Responsable: Budini)
-"""
 import matplotlib.pyplot as plt
 
 
 def graficar(resultados, probs, limites):
-    """limites: {"A": {"p1": float, "p2": float, "p3": float}, "B": {...}, "C": {...}}"""
-    # TODO Budini (usar plt.savefig para guardar los PNG y plt.show() al final)
     print("[graficos] pendiente")
 
 

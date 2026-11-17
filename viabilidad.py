@@ -1,19 +1,9 @@
-"""Requisito 5: tabla de viabilidad (límite <= C_MAX) y recomendación justificada.
-(Responsable: Poblete)
-"""
-
-
 def tabla_viabilidad(limites, probs, c_max):
-    """limites: {"A": {"p1": float, ...}, ...}. Imprime la tabla y devuelve
-    {"A": {"p1": bool, ...}, ...} (True = cumple el umbral)."""
-    # TODO Poblete
     print("[viabilidad] pendiente")
     return {}
 
 
 def recomendar(limites, probs, c_max):
-    """Imprime la combinación (caso, p) recomendada y su justificación."""
-    # TODO Poblete
     print("[recomendacion] pendiente")
 
 

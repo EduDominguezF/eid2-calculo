@@ -1,10 +1,7 @@
-"""Parámetros globales del proyecto. (Responsable: base)"""
-
-# TODO: RUT elegido por el equipo, solo dígitos, sin puntos ni guion (se usan los 8 primeros)
 RUT = "24365895"
 
-K = 10          # cantidad de sumas parciales a mostrar (S1..S10)
-C_MAX = 10      # umbral de costo máximo
+K = 10         
+C_MAX = 10     
 CASOS = ["A", "B", "C"]
 
 
