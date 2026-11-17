@@ -1,4 +1,4 @@
-def analizar_convergencia(resultados, probs, tol=1e-6, k_max=100_000):
+def analizar_convergencia(resultados, probs, tol=1e-10, k_max=100_000):
     return {caso: {n: {"converge": None, "limite": sumas[-1], "k": len(sumas)}
                    for n, sumas in por_p.items()}
             for caso, por_p in resultados.items()}
