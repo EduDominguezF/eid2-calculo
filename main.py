@@ -38,6 +38,7 @@ def main():
             print(f"RUT inválido: {e} Intente nuevamente.")
     plt.show()
 
+
 if __name__ == "__main__":
     from visualizacion import Aplicacion
-    Aplicacion().mainloop()
+    Aplicacion(ejecutar).mainloop()

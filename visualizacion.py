@@ -8,8 +8,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
-from main import ejecutar
-
 
 class Duplicador(io.TextIOBase):
     def __init__(self, consola):
@@ -34,12 +32,17 @@ def validar_formato(texto):
         return "El RUT solo puede contener números, puntos, guion y K."
     if limpio.count("-") > 1:
         return "El RUT solo puede tener un guion."
+    if sum(c.isdigit() for c in limpio) < 8:
+        return "El RUT debe tener al menos 8 dígitos (sin contar la K)."
     return None
 
 
 class Aplicacion(tk.Tk):
-    def __init__(self):
+    def __init__(self, funcion_ejecutar=None):
         super().__init__()
+        if funcion_ejecutar is None:
+            from main import ejecutar as funcion_ejecutar
+        self.ejecutar = funcion_ejecutar
         self.title("EID N°2 - Protocolo ARQ: Límites, Sucesiones y Series")
         self.geometry("1100x750")
         self.minsize(900, 600)
@@ -108,10 +111,10 @@ class Aplicacion(tk.Tk):
         if not figuras:
             self.vaciar_graficos("Gráficos no disponibles todavía.")
             return
-        for marco in self.marcos_graficos:
+        self.vaciar_graficos("Gráfico no disponible todavía.")
+        for marco, figura in zip(self.marcos_graficos, figuras):
             for hijo in marco.winfo_children():
                 hijo.destroy()
-        for marco, figura in zip(self.marcos_graficos, figuras):
             canvas = FigureCanvasTkAgg(figura, master=marco)
             NavigationToolbar2Tk(canvas, marco).update()
             canvas.draw()
@@ -131,7 +134,7 @@ class Aplicacion(tk.Tk):
         salida_original = sys.stdout
         sys.stdout = duplicador
         try:
-            figuras = ejecutar(texto)
+            figuras = self.ejecutar(texto)
         except ValueError as e:
             sys.stdout = salida_original
             self.mostrar_mensaje(str(e), "red")
@@ -142,6 +145,7 @@ class Aplicacion(tk.Tk):
             sys.stdout = salida_original
             self.mostrar_mensaje("Ocurrió un error al calcular.", "red")
             messagebox.showerror("Error", f"Ocurrió un error inesperado:\n{e}")
+            self.vaciar_graficos("Gráficos no disponibles todavía.")
             return
         finally:
             sys.stdout = salida_original
