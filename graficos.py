@@ -1,34 +1,61 @@
 import matplotlib.pyplot as plt
 
-TITULOS = {
-    "A": "Caso A – WiFi estándar: i·(1−p)^(i−1)·p",
-    "B": "Caso B: (1/i)·(1−p)^(i−1)·p",
-    "C": "Caso C: (i+1)·(1−p)^(i−1)·p",
-}
+from config import K, C_MAX, DESCRIPCIONES, ordenar_casos, ordenar_probs
 
 COLORES = ["tab:blue", "tab:orange", "tab:green"]
 MARCADORES = ["o", "s", "^"]
+ESTILOS = ["-", "--", "-."]
+K_GRAFICO_MAX = 300
 
 
-def graficar(resultados, probs, limites):
+def k_para_grafico(convergencia_caso):
+    """Rango de k suficiente para que todas las curvas se vean estabilizadas (error < 0.5%)."""
+    k_graf = K
+    for d in convergencia_caso.values():
+        sumas, limite = d["sumas"], d["limite"]
+        k = next((i for i, s in enumerate(sumas, start=1)
+                  if abs(s - limite) <= 0.005 * abs(limite)), len(sumas))
+        k_graf = max(k_graf, k)
+    return min(int(k_graf * 1.2) + 1, K_GRAFICO_MAX)
+
+
+def graficar(convergencia, c_max=C_MAX, guardar=True):
     figuras = []
-    for caso in ["A", "B", "C"]:
-        fig, ax = plt.subplots(figsize=(8, 5))
-        for j, (nombre, sumas) in enumerate(resultados[caso].items()):
+    for caso in ordenar_casos(convergencia):
+        fig, ax = plt.subplots(figsize=(9, 5.5))
+        por_p = convergencia[caso]
+        k_graf = k_para_grafico(por_p)
+
+        for j, nombre in enumerate(ordenar_probs(por_p)):
+            d = por_p[nombre]
             color = COLORES[j % len(COLORES)]
-            limite = limites[caso][nombre]
+            sumas = d["sumas"][:k_graf]
             ks = range(1, len(sumas) + 1)
-            ax.plot(ks, sumas, color=color, marker=MARCADORES[j % len(MARCADORES)],
-                    label=f"{nombre} = {probs[nombre]:.2f}  (límite ≈ {limite:.4f})")
-            ax.axhline(limite, color=color, linestyle=":", linewidth=1.5)
-        ax.set_title(TITULOS.get(caso, f"Caso {caso}"))
-        ax.set_xlabel("k")
-        ax.set_ylabel("Sk")
-        ax.set_xticks(list(range(1, len(sumas) + 1)))
+            ax.plot(ks, sumas, color=color, linewidth=1.8, linestyle=ESTILOS[j % len(ESTILOS)],
+                    label=f"{nombre} = {d['p']:.2f}   →  L ≈ {d['limite']:.4f}")
+            ax.plot(list(ks)[:K], sumas[:K], linestyle="none",
+                    marker=MARCADORES[j % len(MARCADORES)], color=color, markersize=5)
+            ax.axhline(d["limite"], color=color, linestyle=":", linewidth=1.2, alpha=0.8)
+            ax.annotate(f"L = {d['limite']:.4f}", xy=(k_graf, d["limite"]),
+                        xytext=(-4, 4), textcoords="offset points",
+                        ha="right", va="bottom", color=color, fontsize=9, fontweight="bold")
+
+        max_lim = max(d["limite"] for d in por_p.values())
+        if max_lim >= 0.5 * c_max:
+            ax.axhline(c_max, color="red", linewidth=1.5, label=f"C_máx = {c_max:g}")
+        ax.axvline(K, color="gray", linestyle=":", linewidth=1)
+        ax.text(K, ax.get_ylim()[0], f" k = {K} (tabla)", color="gray", fontsize=8,
+                va="bottom", ha="left")
+
+        ax.set_title(DESCRIPCIONES.get(caso, f"Caso {caso}"))
+        ax.set_xlabel("k (número de términos sumados)")
+        ax.set_ylabel("S_k (suma parcial)")
+        ax.set_xlim(0, k_graf + 1)
         ax.grid(True, alpha=0.4)
-        ax.legend()
+        ax.legend(loc="lower right")
         fig.tight_layout()
-        fig.savefig(f"caso_{caso}.png", dpi=120)
+        if guardar:
+            fig.savefig(f"caso_{caso}.png", dpi=120)
         figuras.append(fig)
     return figuras
 
@@ -36,7 +63,6 @@ def graficar(resultados, probs, limites):
 if __name__ == "__main__":
     from config import PROBS
     from series import calcular_todo
-    res = calcular_todo(PROBS)
-    limites_prueba = {c: {n: s[-1] for n, s in por_p.items()} for c, por_p in res.items()}
-    graficar(res, PROBS, limites_prueba)
+    from convergencia import analizar_convergencia
+    graficar(analizar_convergencia(calcular_todo(PROBS), PROBS))
     plt.show()

@@ -1,3 +1,5 @@
+import math
+
 from config import K, CASOS
 
 
@@ -23,3 +25,29 @@ def sucesion(caso, p, k=K):
 def calcular_todo(probs, k=K):
     return {caso: {nombre: sucesion(caso, p, k) for nombre, p in probs.items()}
             for caso in CASOS}
+
+
+def razon_cociente(caso, p, i=1_000_000):
+    """Aproxima lim a_{i+1}/a_i (criterio del cociente); el valor exacto es 1 - p.
+    Se usa la forma simplificada del cociente para evitar underflow con i grande."""
+    q = 1 - p
+    factores = {"A": (i + 1) / i, "B": i / (i + 1), "C": (i + 2) / (i + 1)}
+    return factores[caso] * q
+
+
+def limite_teorico(caso, p):
+    """Suma exacta de la serie, usada para validar el límite empírico."""
+    if caso == "A":   # Σ i q^(i-1) p = p / (1-q)^2
+        return 1 / p
+    if caso == "B":   # Σ q^(i-1) p / i = (p/q)·(-ln(1-q))
+        return -p * math.log(p) / (1 - p)
+    if caso == "C":   # Σ (i+1) q^(i-1) p = 1/p + 1
+        return 1 / p + 1
+    raise ValueError(f"Caso desconocido: {caso}")
+
+
+FORMULAS_LIMITE = {
+    "A": "1/p",
+    "B": "−p·ln(p)/(1−p)",
+    "C": "1/p + 1",
+}
