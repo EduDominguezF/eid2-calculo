@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 from config import K, C_MAX, DESCRIPCIONES, ordenar_casos, ordenar_probs
 
-COLORES = ["tab:blue", "tab:orange", "tab:green"]
+COLORES = ["#65a9ff", "#ffbd69", "#54d6a0"]
 MARCADORES = ["o", "s", "^"]
 ESTILOS = ["-", "--", "-."]
 K_GRAFICO_MAX = 300
@@ -23,6 +23,8 @@ def graficar(convergencia, c_max=C_MAX, guardar=True):
     figuras = []
     for caso in ordenar_casos(convergencia):
         fig, ax = plt.subplots(figsize=(9, 5.5))
+        fig.patch.set_facecolor("#151f30")
+        ax.set_facecolor("#151f30")
         por_p = convergencia[caso]
         k_graf = k_para_grafico(por_p)
 
@@ -42,17 +44,23 @@ def graficar(convergencia, c_max=C_MAX, guardar=True):
 
         max_lim = max(d["limite"] for d in por_p.values())
         if max_lim >= 0.5 * c_max:
-            ax.axhline(c_max, color="red", linewidth=1.5, label=f"C_máx = {c_max:g}")
-        ax.axvline(K, color="gray", linestyle=":", linewidth=1)
-        ax.text(K, ax.get_ylim()[0], f" k = {K} (tabla)", color="gray", fontsize=8,
+            ax.axhline(c_max, color="#ff667a", linewidth=1.5, label=f"C_máx = {c_max:g}")
+        ax.axvline(K, color="#8796ab", linestyle=":", linewidth=1)
+        ax.text(K, ax.get_ylim()[0], f" k = {K} (tabla)", color="#aab8cc", fontsize=8,
                 va="bottom", ha="left")
 
         ax.set_title(DESCRIPCIONES.get(caso, f"Caso {caso}"))
         ax.set_xlabel("k (número de términos sumados)")
         ax.set_ylabel("S_k (suma parcial)")
+        ax.tick_params(colors="#c3d0e1")
+        ax.xaxis.label.set_color("#d7e2f0")
+        ax.yaxis.label.set_color("#d7e2f0")
+        ax.title.set_color("#f1f5fb")
+        for borde in ax.spines.values():
+            borde.set_color("#46566d")
         ax.set_xlim(0, k_graf + 1)
-        ax.grid(True, alpha=0.4)
-        ax.legend(loc="lower right")
+        ax.grid(True, color="#506079", alpha=0.3)
+        ax.legend(loc="lower right", facecolor="#202c3e", edgecolor="#46566d", labelcolor="#e5edf8")
         fig.tight_layout()
         if guardar:
             fig.savefig(f"caso_{caso}.png", dpi=120)

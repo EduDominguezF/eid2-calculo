@@ -33,11 +33,13 @@ def ejecutar(rut_texto):
     imprimir_convergencia(conv, resultados)
 
     viabilidad = tabla_viabilidad(conv, C_MAX)
-    recomendar(conv, viabilidad, C_MAX)
+    recomendacion = recomendar(conv, viabilidad, C_MAX)
 
     figuras = graficar(conv, C_MAX)
     print("\nGráficos generados: caso_A.png, caso_B.png, caso_C.png")
-    return figuras
+    return {"figuras": figuras, "probs": probs, "resultados": resultados,
+            "convergencia": conv, "viabilidad": viabilidad,
+            "recomendacion": recomendacion, "c_max": C_MAX, "rut": rut}
 
 
 def modo_consola(rut=None):
@@ -57,8 +59,10 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         modo_consola(" ".join(sys.argv[1:]))
     else:
-        try:
-            from visualizacion import Aplicacion
-            Aplicacion(ejecutar).mainloop()
-        except ImportError:
-            modo_consola()
+        from PyQt6.QtWidgets import QApplication
+        from visualizacion import Aplicacion
+
+        app = QApplication(sys.argv)
+        ventana = Aplicacion(ejecutar)
+        ventana.show()
+        sys.exit(app.exec())

@@ -23,14 +23,13 @@ def tabla_viabilidad(convergencia, c_max):
 
 
 def recomendar(convergencia, viabilidad, c_max):
-    """Entre las viables elige la que converge más rápido (menor k estable);
-    en empate, la de menor límite. Así el sistema es robusto y económico."""
+    """Entre las viables minimiza el límite (costo esperado); desempata por k estable."""
     candidatas = []
     for caso in ordenar_casos(convergencia):
         for nombre in ordenar_probs(convergencia[caso]):
             if viabilidad[caso][nombre]:
                 d = convergencia[caso][nombre]
-                candidatas.append((d["k_estable"], d["limite"], caso, nombre))
+                candidatas.append((d["limite"], d["k_estable"], caso, nombre))
 
     print("\n4) RECOMENDACIÓN")
     if not candidatas:
@@ -46,9 +45,8 @@ def recomendar(convergencia, viabilidad, c_max):
     print(f"  - Su límite empírico es {d['limite']:.6f} ({INTERPRETACIONES[caso]}), "
           f"igual al teórico {d['teorico']:.6f}.")
     print(f"  - Cumple C_máx = {c_max:g} con un margen de {margen:.6f}.")
-    print(f"  - Es la combinación viable que se estabiliza más rápido: "
-          f"basta k = {d['k_estable']} términos para |S_k - L| < 1e-6,")
-    print("    por lo que el costo real se acerca a su valor esperado con pocos reintentos.")
+    print(f"  - Entre las opciones viables, tiene el menor costo esperado; "
+          f"se estabiliza en k = {d['k_estable']} términos (|S_k - L| < 1e-6).")
 
     no_viables = [(c, n) for c in viabilidad for n in viabilidad[c] if not viabilidad[c][n]]
     if no_viables:
