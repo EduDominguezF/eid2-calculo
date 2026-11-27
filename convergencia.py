@@ -3,14 +3,13 @@ from series import termino, razon_cociente, limite_teorico, FORMULAS_LIMITE
 
 
 def analizar_una(caso, p, tol=TOL, k_max=K_MAX, eps=EPS_ESTABLE):
-    """Suma términos hasta que el término i-ésimo sea < tol (límite empírico)."""
     sumas, acumulado, converge = [], 0.0, False
     for i in range(1, k_max + 1):
         a_i = termino(caso, i, p)
         acumulado += a_i
         sumas.append(acumulado)
         if i > 1 and a_i < tol:
-            converge = True
+            converge = razon_cociente(caso, p) < 1
             break
 
     limite = acumulado
@@ -57,12 +56,16 @@ def imprimir_convergencia(convergencia, resultados=None):
                   f"{s10:>14.6f}{d['limite']:>18.10f}{d['teorico']:>17.10f}"
                   f"{d['error']:>11.1e}{d['k_estable']:>11}")
     print("-" * len(encabezado))
-    print("Conclusión: las 9 sucesiones convergen; el límite empírico coincide con el teórico.")
+    datos = [d for por_p in convergencia.values() for d in por_p.values()]
+    n_convergentes = sum(d["converge"] for d in datos)
+    error_maximo = max(d["error"] for d in datos)
+    print(f"Conclusión: {n_convergentes} de {len(datos)} sucesiones convergen; "
+          f"el límite empírico coincide con el teórico (error máximo {error_maximo:.1e}).")
     print("Mientras menor es p, la razón (1 - p) se acerca a 1 y se necesitan más términos para estabilizar.")
 
 
 if __name__ == "__main__":
     from config import PROBS
     from series import calcular_todo
-    res = calcular_todo(PROBS)
-    imprimir_convergencia(analizar_convergencia(res, PROBS), res)
+    resultados = calcular_todo(PROBS)
+    imprimir_convergencia(analizar_convergencia(resultados, PROBS), resultados)

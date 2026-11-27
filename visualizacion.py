@@ -44,7 +44,7 @@ class Aplicacion(QMainWindow):
         if funcion_ejecutar is None:
             from main import ejecutar as funcion_ejecutar
         self.ejecutar = funcion_ejecutar
-        self.canvases = []
+        self.lienzos = []
         self.setWindowTitle("EID N°2 · Protocolo ARQ")
         self.resize(1180, 820)
         self.setMinimumSize(900, 620)
@@ -81,18 +81,18 @@ class Aplicacion(QMainWindow):
         raiz.setContentsMargins(24, 22, 24, 18)
         raiz.setSpacing(16)
 
-        header = QFrame(objectName="header")
-        hl = QVBoxLayout(header)
-        hl.setContentsMargins(26, 20, 26, 22)
-        hl.setSpacing(5)
-        eyebrow = QLabel("EID N°2  /  CÁLCULO", objectName="eyebrow")
-        hl.addWidget(eyebrow)
+        encabezado = QFrame(objectName="header")
+        disposicion_encabezado = QVBoxLayout(encabezado)
+        disposicion_encabezado.setContentsMargins(26, 20, 26, 22)
+        disposicion_encabezado.setSpacing(5)
+        antetitulo = QLabel("EID N°2  /  CÁLCULO", objectName="eyebrow")
+        disposicion_encabezado.addWidget(antetitulo)
         titulo = QLabel("Análisis de series · Protocolo ARQ", objectName="title")
         titulo.setFont(QFont("Segoe UI", 22, QFont.Weight.Bold))
         subtitulo = QLabel("Límites, sucesiones y evaluación de viabilidad", objectName="subtitle")
-        hl.addWidget(titulo)
-        hl.addWidget(subtitulo)
-        raiz.addWidget(header)
+        disposicion_encabezado.addWidget(titulo)
+        disposicion_encabezado.addWidget(subtitulo)
+        raiz.addWidget(encabezado)
 
         panel = QFrame(objectName="panel")
         fila = QHBoxLayout(panel)
@@ -117,11 +117,11 @@ class Aplicacion(QMainWindow):
 
         self.pestanas = QTabWidget()
         self.resumen = QWidget()
-        self.resumen_layout = QVBoxLayout(self.resumen)
-        self.resumen_layout.setContentsMargins(18, 18, 18, 18)
-        self.resumen_layout.setSpacing(14)
-        self.resumen_hint = QLabel("Calcula con un RUT para ver el resumen.")
-        self.resumen_layout.addWidget(self.resumen_hint)
+        self.resumen_disposicion = QVBoxLayout(self.resumen)
+        self.resumen_disposicion.setContentsMargins(18, 18, 18, 18)
+        self.resumen_disposicion.setSpacing(14)
+        self.resumen_aviso = QLabel("Calcula con un RUT para ver el resumen.")
+        self.resumen_disposicion.addWidget(self.resumen_aviso)
         self.pestanas.addTab(self.resumen, "Resumen")
 
         self.tabla = self._nueva_tabla()
@@ -137,11 +137,11 @@ class Aplicacion(QMainWindow):
         self.marcos_graficos = []
         for caso in "ABC":
             marco = QWidget()
-            layout = QVBoxLayout(marco)
+            disposicion = QVBoxLayout(marco)
             aviso = QLabel("Calcula con un RUT para visualizar este gráfico.")
             aviso.setAlignment(Qt.AlignmentFlag.AlignCenter)
             aviso.setStyleSheet("color:#aab8cc")
-            layout.addWidget(aviso)
+            disposicion.addWidget(aviso)
             self.marcos_graficos.append(marco)
             self.pestanas.addTab(marco, f"Caso {caso}")
         raiz.addWidget(self.pestanas, 1)
@@ -160,70 +160,70 @@ class Aplicacion(QMainWindow):
 
     @staticmethod
     def _celda(tabla, fila, columna, valor):
-        item = QTableWidgetItem(str(valor))
-        item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-        tabla.setItem(fila, columna, item)
+        elemento = QTableWidgetItem(str(valor))
+        elemento.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+        tabla.setItem(fila, columna, elemento)
 
     def _mostrar_datos(self, datos):
         probs, conv, viable = datos["probs"], datos["convergencia"], datos["viabilidad"]
-        while self.resumen_layout.count() > 1:
-            item = self.resumen_layout.takeAt(1)
-            if item.widget(): item.widget().deleteLater()
-        hint = self.resumen_hint
-        hint.setText(f"RUT {datos['rut']}  ·  Umbral de costo Cₘáx = {datos['c_max']:g}")
+        while self.resumen_disposicion.count() > 1:
+            elemento = self.resumen_disposicion.takeAt(1)
+            if elemento.widget(): elemento.widget().deleteLater()
+        aviso_resumen = self.resumen_aviso
+        aviso_resumen.setText(f"RUT {datos['rut']}  ·  Umbral de costo Cₘáx = {datos['c_max']:g}")
         tarjetas = QHBoxLayout()
         for nombre, p in probs.items():
             tarjeta = QFrame(objectName="panel")
-            tl = QVBoxLayout(tarjeta)
-            tl.addWidget(QLabel(nombre.upper()))
+            disposicion_tarjeta = QVBoxLayout(tarjeta)
+            disposicion_tarjeta.addWidget(QLabel(nombre.upper()))
             valor = QLabel(f"{p:.2f}")
             valor.setStyleSheet("font-size:22pt; font-weight:700; color:#83b5ff")
-            tl.addWidget(valor)
+            disposicion_tarjeta.addWidget(valor)
             tarjetas.addWidget(tarjeta)
-        self.resumen_layout.addLayout(tarjetas)
+        self.resumen_disposicion.addLayout(tarjetas)
         caso, nombre = datos["recomendacion"] if datos["recomendacion"] else (None, None)
         if caso:
             d = conv[caso][nombre]
-            rec = QLabel(f"RECOMENDACIÓN   Caso {caso} · {nombre} = {d['p']:.2f}     |     Costo esperado {d['limite']:.4f}     |     Margen {datos['c_max']-d['limite']:.4f}")
-            rec.setWordWrap(True)
-            rec.setStyleSheet("background:#183a39; color:#8ce3bd; border:1px solid #28665a; border-radius:10px; padding:16px; font-size:12pt; font-weight:700")
-            self.resumen_layout.addWidget(rec)
+            recomendacion = QLabel(f"RECOMENDACIÓN   Caso {caso} · {nombre} = {d['p']:.2f}     |     Costo esperado {d['limite']:.4f}     |     Margen {datos['c_max']-d['limite']:.4f}")
+            recomendacion.setWordWrap(True)
+            recomendacion.setStyleSheet("background:#183a39; color:#8ce3bd; border:1px solid #28665a; border-radius:10px; padding:16px; font-size:12pt; font-weight:700")
+            self.resumen_disposicion.addWidget(recomendacion)
         else:
-            self.resumen_layout.addWidget(QLabel("Ninguna combinación cumple el umbral de costo."))
-        self.resumen_layout.addWidget(QLabel("El método del cociente confirma convergencia para 0 < p < 1. El error reportado compara la suma truncada con el límite teórico."))
+            self.resumen_disposicion.addWidget(QLabel("Ninguna combinación cumple el umbral de costo."))
+        self.resumen_disposicion.addWidget(QLabel("El método del cociente confirma convergencia para 0 < p < 1. El error reportado compara la suma truncada con el límite teórico."))
 
-        names = list(probs)
+        nombres = list(probs)
         casos = list(datos["resultados"])
-        nrows = len(next(iter(datos["resultados"][casos[0]].values())))
-        self.tabla.setRowCount(nrows * len(casos)); self.tabla.setColumnCount(1 + len(names))
-        self.tabla.setHorizontalHeaderLabels(["Caso / k"] + [f"{n} (p={probs[n]:.2f})" for n in names])
-        row = 0
+        n_filas = len(next(iter(datos["resultados"][casos[0]].values())))
+        self.tabla.setRowCount(n_filas * len(casos)); self.tabla.setColumnCount(1 + len(nombres))
+        self.tabla.setHorizontalHeaderLabels(["Caso / k"] + [f"{n} (p={probs[n]:.2f})" for n in nombres])
+        fila_actual = 0
         for c in casos:
-            for k in range(nrows):
-                self._celda(self.tabla,row,0,f"{c} / S{k+1}")
-                for j,n in enumerate(names,1): self._celda(self.tabla,row,j,f"{datos['resultados'][c][n][k]:.6f}")
-                row += 1
-        entries = [(c,n,d) for c,por_p in conv.items() for n,d in por_p.items()]
-        headers = ["Caso", "Probabilidad", "Límite teórico", "Límite empírico", "Error absoluto", "k estable", "Viabilidad"]
-        self.tabla_conv.setColumnCount(len(headers)); self.tabla_conv.setRowCount(len(entries)); self.tabla_conv.setHorizontalHeaderLabels(headers)
-        for i,(c,n,d) in enumerate(entries):
-            vals = [c, f"{d['p']:.2f}", f"{d['teorico']:.8f}", f"{d['limite']:.8f}", f"{d['error']:.2e}", d['k_estable'], "CUMPLE" if viable[c][n] else "NO CUMPLE"]
-            for j,v in enumerate(vals): self._celda(self.tabla_conv,i,j,v)
+            for k in range(n_filas):
+                self._celda(self.tabla,fila_actual,0,f"{c} / S{k+1}")
+                for j,n in enumerate(nombres,1): self._celda(self.tabla,fila_actual,j,f"{datos['resultados'][c][n][k]:.6f}")
+                fila_actual += 1
+        filas_conv = [(c,n,d) for c,por_p in conv.items() for n,d in por_p.items()]
+        encabezados = ["Caso", "Probabilidad", "Límite teórico", "Límite empírico", "Error absoluto", "k estable", "Viabilidad"]
+        self.tabla_conv.setColumnCount(len(encabezados)); self.tabla_conv.setRowCount(len(filas_conv)); self.tabla_conv.setHorizontalHeaderLabels(encabezados)
+        for i,(c,n,d) in enumerate(filas_conv):
+            valores = [c, f"{d['p']:.2f}", f"{d['teorico']:.8f}", f"{d['limite']:.8f}", f"{d['error']:.2e}", d['k_estable'], "CUMPLE" if viable[c][n] else "NO CUMPLE"]
+            for j,v in enumerate(valores): self._celda(self.tabla_conv,i,j,v)
 
     def mostrar_mensaje(self, texto, color="#64748b"):
         self.mensaje.setText(texto)
         self.mensaje.setStyleSheet(f"color:{color}; padding-left:8px; background:transparent")
 
     def _limpiar_graficos(self, aviso):
-        for canvas in self.canvases:
-            plt.close(canvas.figure)
-        self.canvases.clear()
+        for lienzo in self.lienzos:
+            plt.close(lienzo.figure)
+        self.lienzos.clear()
         for marco in self.marcos_graficos:
             while marco.layout().count():
-                item = marco.layout().takeAt(0)
-                widget = item.widget()
-                if widget:
-                    widget.deleteLater()
+                elemento = marco.layout().takeAt(0)
+                componente = elemento.widget()
+                if componente:
+                    componente.deleteLater()
             etiqueta = QLabel(aviso)
             etiqueta.setAlignment(Qt.AlignmentFlag.AlignCenter)
             etiqueta.setStyleSheet("color:#aab8cc")
@@ -233,16 +233,16 @@ class Aplicacion(QMainWindow):
         self._limpiar_graficos("Gráfico no disponible.")
         for marco, figura in zip(self.marcos_graficos, figuras):
             while marco.layout().count():
-                item = marco.layout().takeAt(0)
-                if item.widget():
-                    item.widget().deleteLater()
-            canvas = FigureCanvasQTAgg(figura)
-            barra = NavigationToolbar2QT(canvas, marco)
+                elemento = marco.layout().takeAt(0)
+                if elemento.widget():
+                    elemento.widget().deleteLater()
+            lienzo = FigureCanvasQTAgg(figura)
+            barra = NavigationToolbar2QT(lienzo, marco)
             barra.setStyleSheet("QToolBar { background:#1b2739; border:0; spacing:5px; } QToolButton { color:#dce7f5; background:transparent; padding:4px; } QToolButton:hover { background:#30435f; border-radius:4px; }")
             marco.layout().addWidget(barra)
-            marco.layout().addWidget(canvas)
-            canvas.draw()
-            self.canvases.append(canvas)
+            marco.layout().addWidget(lienzo)
+            lienzo.draw()
+            self.lienzos.append(lienzo)
 
     def calcular(self):
         texto = self.entrada.text()
@@ -284,13 +284,13 @@ class Aplicacion(QMainWindow):
         self.mostrar_mensaje("Ingresa tu RUT para generar el análisis.")
         self.entrada.setFocus()
 
-    def closeEvent(self, event):
+    def closeEvent(self, evento):
         plt.close("all")
-        event.accept()
+        evento.accept()
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
+    aplicacion = QApplication(sys.argv)
     ventana = Aplicacion()
     ventana.show()
-    sys.exit(app.exec())
+    sys.exit(aplicacion.exec())

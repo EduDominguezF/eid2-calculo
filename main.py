@@ -59,10 +59,15 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         modo_consola(" ".join(sys.argv[1:]))
     else:
-        from PyQt6.QtWidgets import QApplication
-        from visualizacion import Aplicacion
+        try:
+            from PyQt6.QtWidgets import QApplication
+            from visualizacion import Aplicacion
+        except ImportError:
+            print("PyQt6 no está disponible: se ejecuta en modo consola.")
+            modo_consola()
+            sys.exit(0)
 
-        app = QApplication(sys.argv)
+        aplicacion = QApplication(sys.argv)
         ventana = Aplicacion(ejecutar)
         ventana.show()
-        sys.exit(app.exec())
+        sys.exit(aplicacion.exec())

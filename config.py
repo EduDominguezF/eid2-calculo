@@ -1,9 +1,9 @@
-K = 10                 # Número de sumas parciales que se tabulan (S1..S10)
-C_MAX = 10             # Umbral de costo máximo (transmisiones esperadas)
+K = 10
+C_MAX = 10
 CASOS = ["A", "B", "C"]
-TOL = 1e-12            # Criterio de parada: término i-ésimo menor que TOL
-K_MAX = 100_000        # Máximo de términos antes de declarar divergencia
-EPS_ESTABLE = 1e-6     # |S_k - L| < EPS_ESTABLE  =>  la sucesión se considera estabilizada
+TOL = 1e-12
+K_MAX = 100_000
+EPS_ESTABLE = 1e-6
 RUT_PRUEBA = "24365895"
 
 DESCRIPCIONES = {

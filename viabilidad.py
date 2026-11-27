@@ -23,30 +23,39 @@ def tabla_viabilidad(convergencia, c_max):
 
 
 def recomendar(convergencia, viabilidad, c_max):
-    """Entre las viables minimiza el límite (costo esperado); desempata por k estable."""
     candidatas = []
     for caso in ordenar_casos(convergencia):
         for nombre in ordenar_probs(convergencia[caso]):
             if viabilidad[caso][nombre]:
                 d = convergencia[caso][nombre]
-                candidatas.append((d["limite"], d["k_estable"], caso, nombre))
+                candidatas.append((round(d["razon"], 12), d["k_estable"], d["limite"], caso, nombre))
 
     print("\n4) RECOMENDACIÓN")
     if not candidatas:
         print(f"No hay combinaciones viables: ninguna cumple el umbral de {c_max:g}.")
         return None
 
-    _, _, caso, nombre = min(candidatas)
+    candidatas.sort()
+    *_, caso, nombre = candidatas[0]
     d = convergencia[caso][nombre]
     margen = c_max - d["limite"]
     print(f"Se recomienda: Caso {caso} con {nombre} = {d['p']:.2f}.")
+    print("Criterio: entre las combinaciones viables se elige la que converge más rápido "
+          "(menor razón 1 - p); se desempata por menos términos para estabilizar y menor límite.")
     print("Justificación (análisis de convergencia):")
-    print(f"  - La serie converge (criterio del cociente: razón 1 - p = {d['razon']:.4f} < 1).")
+    print(f"  - La serie converge (criterio del cociente: razón 1 - p = {d['razon']:.4f} < 1), "
+          f"la menor razón entre las viables.")
+    print(f"  - Se estabiliza en k = {d['k_estable']} términos (|S_k - L| < 1e-6), "
+          f"la menor cantidad entre las viables.")
     print(f"  - Su límite empírico es {d['limite']:.6f} ({INTERPRETACIONES[caso]}), "
           f"igual al teórico {d['teorico']:.6f}.")
     print(f"  - Cumple C_máx = {c_max:g} con un margen de {margen:.6f}.")
-    print(f"  - Entre las opciones viables, tiene el menor costo esperado; "
-          f"se estabiliza en k = {d['k_estable']} términos (|S_k - L| < 1e-6).")
+    print(f"  - p = {d['p']:.2f} es la mayor probabilidad de éxito por transmisión entre las viables, "
+          f"por lo que es la opción más confiable.")
+    if len(candidatas) > 1:
+        otras = ", ".join(f"{c}-{n} (L = {convergencia[c][n]['limite']:.4f}, k = {convergencia[c][n]['k_estable']})"
+                          for *_, c, n in candidatas[1:])
+        print(f"  - Otras viables, con convergencia más lenta o mayor costo: {otras}.")
 
     no_viables = [(c, n) for c in viabilidad for n in viabilidad[c] if not viabilidad[c][n]]
     if no_viables:
