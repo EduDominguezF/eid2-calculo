@@ -1,3 +1,7 @@
+
+#Nombres: Javier Poblete, Alessandro Budini, Eduardo Dominguez
+#Calculo Basico
+
 import sys
 
 from config import C_MAX, limpiar_rut, calcular_probabilidades
@@ -71,3 +75,8 @@ if __name__ == "__main__":
         ventana = Aplicacion(ejecutar)
         ventana.show()
         sys.exit(aplicacion.exec())
+
+
+
+
+
